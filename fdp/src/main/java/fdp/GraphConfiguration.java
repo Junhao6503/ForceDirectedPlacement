@@ -29,7 +29,12 @@ public class GraphConfiguration {
 	 */
 	public Graph<Vertex, Edge> generateGraph() {
 		Graph<Vertex, Edge> graph = new SimpleGraph<>(new EdgeFactory());
-		this.generator.generateGraph(graph, new VertexFactory(), null);
+//		this.generator.generateGraph(graph, new VertexFactory(), null);
+		Vertex v1 = new Vertex();
+		Vertex v2  = new Vertex();
+		graph.addVertex(v1);
+		graph.addVertex(v2);
+		graph.addEdge(v1, v2);
 		return graph;
 	}
 
