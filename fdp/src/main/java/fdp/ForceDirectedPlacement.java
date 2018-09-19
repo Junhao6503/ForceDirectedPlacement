@@ -1,5 +1,6 @@
 package fdp;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -50,7 +51,14 @@ public class ForceDirectedPlacement {
 		
 		// need sampleSize objects of the same graph, because we will simulate them in parallel
 		List<Graph<Vertex, Edge>> graphs = new ArrayList<>();
-		IntStream.range(0, sampleSize).forEach(i -> graphs.add(config.generateGraph()));
+		IntStream.range(0, sampleSize).forEach(i -> {
+			try {
+				graphs.add(config.generateGraph());
+			} catch (FileNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
 		
 		// for every cooling rate to test, simulate sampleSize graph layouts in parallel, retrieve the iterations used until equilibrium,
 		// and calculate the average number of iterations for that cooling rate
