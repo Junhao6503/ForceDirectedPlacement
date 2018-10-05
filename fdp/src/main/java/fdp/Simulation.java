@@ -128,7 +128,6 @@ public class Simulation implements Callable<Integer> {
 	 * Simulates a single step.
 	 */
 	private void simulateStep() {
-
 		// calculate repulsive forces (from every vertex to every other)
 		for (Vertex v : graph.vertexSet()) {
 			// reset displacement vector for new calculation
@@ -150,7 +149,13 @@ public class Simulation implements Callable<Integer> {
 
 		// calculate attractive forces (only between neighbors)
 		for (Edge e : graph.edgeSet()) {
-
+			Vertex src = e.getU();
+			Vertex dst = e.getV();
+			if(src.communities == dst.communities) {
+				e.edge_type = 0;
+			} else {
+				e.edge_type = 1;
+			}
 			// normalized difference position vector of v and u
 			Vector2d deltaPos = new Vector2d();
 			deltaPos.sub(e.getV().getPos(), e.getU().getPos());

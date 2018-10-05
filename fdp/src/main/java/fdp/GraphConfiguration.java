@@ -61,15 +61,26 @@ public class GraphConfiguration {
 		String line;
 		Set<String> set = new HashSet<>();
 		ArrayList<Vertex> list = new ArrayList();
-		for(int i = 1; i <= 63; i ++) {
+		for(int i = 0; i < 62; i ++) {
 			list.add(new Vertex());
 		}
-		for (int i = 0; i < 63; i ++) {
+		File file = new File("/Users/junhao/Downloads/SNAP/communities.txt"); 
+		Scanner sc = new Scanner(file); 
+			    while (sc.hasNextLine()) {
+			        line = sc.nextLine();
+			        String[] splited = line.split("\\t");
+			        int node = Integer.parseInt(splited[0]);
+			        int comm = Integer.parseInt(splited[1]);
+			        list.get(node).communities = comm;
+			        
+			        
+		} 
+		
+		for (int i = 0; i < 62; i ++) {
 			graph.addVertex(list.get(i));
 		}
-		File file = 
-			      new File("/Users/junhao/Downloads/SNAP/dolpins.txt"); 
-			    Scanner sc = new Scanner(file); 
+		file = new File("/Users/junhao/Downloads/SNAP/dolpins.txt"); 
+		sc = new Scanner(file); 
 			    while (sc.hasNextLine()) {
 			        line = sc.nextLine();
 			        String[] splited = line.split("\\t");

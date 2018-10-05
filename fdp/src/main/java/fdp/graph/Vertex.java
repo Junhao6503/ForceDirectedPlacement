@@ -6,6 +6,7 @@ public class Vertex {
 	
 	private Vector2d pos = new Vector2d();
 	private Vector2d disp = new Vector2d();
+	public int communities;
 	
 	public void randomPos(int width, int height) {
 		this.pos.x = Math.random() * width;
@@ -27,5 +28,6 @@ public class Vertex {
 	public void setDisp(Vector2d disp) {
 		this.disp = disp;
 	}
+	
 
 }
