@@ -25,6 +25,9 @@ public class Simulation implements Callable<Integer> {
 	private double coolingRate;
 	private int delay;
 	
+	private double total_score;
+	private double total_length;
+	
 	private static final double C = 0.4;
 
 	private int iteration = 0;
@@ -60,6 +63,8 @@ public class Simulation implements Callable<Integer> {
 		// parse the force strings into Expressions that can be evaluated multiple times
 		attractiveForceExpr = Parser.parse(p.getAttractiveForce(), scope);
 		repulsiveForceExpr = Parser.parse(p.getRepulsiveForce(), scope);
+		total_score = 0;
+		total_length = 0;
 	}
 
 	/**
@@ -86,6 +91,30 @@ public class Simulation implements Callable<Integer> {
 			while (!equilibriumReached && iteration < 1000) {
 				simulateStep();
 			}
+			int counter = 0;
+			for (Edge e : graph.edgeSet()) {
+				counter ++;
+				// normalized difference position vector of v and u
+				Vector2d deltaPos = new Vector2d();
+				deltaPos.sub(e.getV().getPos(), e.getU().getPos());
+				double length = deltaPos.length();
+				total_length += length;
+				
+			}
+			double ave = total_length / counter;
+			
+			for (Edge e : graph.edgeSet()) {
+
+				// normalized difference position vector of v and u
+				Vector2d deltaPos = new Vector2d();
+				deltaPos.sub(e.getV().getPos(), e.getU().getPos());
+				double length = deltaPos.length();
+				total_score += (length - ave) * (length - ave);
+				
+			}
+			System.out.println("AVE: "+ave);
+			System.out.println("Final Score: "+total_score);
+			
 		} else {
 			// simulate iterations-steps
 			for (int i = 0; i < criterion; i++) {
@@ -127,7 +156,9 @@ public class Simulation implements Callable<Integer> {
 			deltaPos.sub(e.getV().getPos(), e.getU().getPos());
 			double length = deltaPos.length();
 			deltaPos.normalize();
-
+			
+			
+			//System.out.println("" + length);
 			// displacements depending on attractive force
 			deltaPos.scale(this.forceAttractive(length, k));
 
