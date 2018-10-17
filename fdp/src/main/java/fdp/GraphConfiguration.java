@@ -87,6 +87,8 @@ public class GraphConfiguration {
 			        int source = Integer.parseInt(splited[0]);
 			        int dest = Integer.parseInt(splited[1]);
 			        graph.addEdge(list.get(source), list.get(dest));
+			        list.get(source).neighbors.add(list.get(dest));
+			        list.get(dest).neighbors.add(list.get(source));
 			        
 			    } 
 	}

@@ -1,5 +1,7 @@
 package fdp.graph;
 
+import java.util.HashSet;
+
 import javax.vecmath.Vector2d;
 
 public class Vertex {
@@ -7,6 +9,7 @@ public class Vertex {
 	private Vector2d pos = new Vector2d();
 	private Vector2d disp = new Vector2d();
 	public int communities;
+	public HashSet<Vertex> neighbors = new HashSet<Vertex>(); 
 	
 	public void randomPos(int width, int height) {
 		this.pos.x = Math.random() * width;

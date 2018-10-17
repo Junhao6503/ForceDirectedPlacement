@@ -146,6 +146,27 @@ public class Simulation implements Callable<Integer> {
 				}
 			}
 		}
+		
+		for (Vertex v : graph.vertexSet()) {
+			for (Vertex u : graph.vertexSet()) {
+				if (!v.equals(u) && v.communities == u.communities && !v.neighbors.contains(u)) {
+					// normalized difference position vector of v and u
+					Vector2d deltaPos = new Vector2d();
+					deltaPos.sub(v.getPos(), u.getPos());
+					double length = deltaPos.length();
+					deltaPos.normalize();
+					if(length < 200) {
+						
+					} else {
+						deltaPos.scale(this.forceAttractive(length, k));
+						v.getDisp().sub(deltaPos);
+						u.getDisp().add(deltaPos);
+					}
+					
+					
+				}
+			}
+		}
 
 		// calculate attractive forces (only between neighbors)
 		for (Edge e : graph.edgeSet()) {
@@ -162,13 +183,28 @@ public class Simulation implements Callable<Integer> {
 			double length = deltaPos.length();
 			deltaPos.normalize();
 			
-			
+			if(e.edge_type == 0) {
+				if(length < 50) {
+					
+				} else {
+					deltaPos.scale(this.forceAttractive(length, k));
+					e.getV().getDisp().sub(deltaPos);
+					e.getU().getDisp().add(deltaPos);
+				}
+			} else if (e.edge_type == 1) {
+				if(length < 300) {
+					
+				} else {
+					deltaPos.scale(this.forceAttractive(length, k));
+					e.getV().getDisp().sub(deltaPos);
+					e.getU().getDisp().add(deltaPos);
+				}
+			}
 			//System.out.println("" + length);
 			// displacements depending on attractive force
-			deltaPos.scale(this.forceAttractive(length, k));
-
-			e.getV().getDisp().sub(deltaPos);
-			e.getU().getDisp().add(deltaPos);
+			
+			
+			
 		}
 
 		// assume equilibrium
@@ -221,6 +257,8 @@ public class Simulation implements Callable<Integer> {
 		varD.setValue(d);
 		varK.setValue(k);
 		return attractiveForceExpr.evaluate();
+		
+		
 	}
 
 	/**
@@ -233,9 +271,18 @@ public class Simulation implements Callable<Integer> {
 	 * @return amount of force
 	 */
 	private double forceRepulsive(double d, double k) {
-		varD.setValue(d);
-		varK.setValue(k);
-		return repulsiveForceExpr.evaluate();
+		if(d < 300) {
+			varD.setValue(d);
+			varK.setValue(k);
+			return repulsiveForceExpr.evaluate();
+		} else {
+			varD.setValue(d);
+			varK.setValue(k);
+			return repulsiveForceExpr.evaluate();
+//			return (k*k / 300);
+		}
+		
+		
 	}
 
 	@Override

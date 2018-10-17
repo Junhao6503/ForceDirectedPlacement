@@ -1,5 +1,6 @@
 package view.controller;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -152,7 +153,7 @@ public class MainWindowController {
 	private GraphGenerator<Vertex, Edge, ?> getSelectedGraphGenerator() {
 		switch (graphChoiceBox.getSelectionModel().getSelectedItem()) {
 		case "Random":
-			return new GnmRandomGraphGenerator<>(graphSizeValue, graphSizeValue);
+			return new GnmRandomGraphGenerator<>(20, 100);
 		case "Linear":
 			return new LinearGraphGenerator<>(graphSizeValue);
 		case "Grid":
@@ -214,7 +215,7 @@ public class MainWindowController {
 	}
 
 	@FXML
-	protected void simulateClicked(ActionEvent e) {
+	protected void simulateClicked(ActionEvent e) throws FileNotFoundException {
 		for (GraphConfiguration config : getGraphConfigurations()) {
 			Graph<Vertex, Edge> graph = config.generateGraph();
 			try {
