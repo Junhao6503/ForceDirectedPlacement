@@ -28,6 +28,7 @@ public class Simulation implements Callable<Integer> {
 	private double total_score;
 	private double total_length;
 	
+	private int counter;
 	private static final double C = 0.4;
 
 	private int iteration = 0;
@@ -65,6 +66,7 @@ public class Simulation implements Callable<Integer> {
 		//repulsiveForceExpr = Parser.parse(p.getRepulsiveForce(), scope);
 		total_score = 0;
 		total_length = 0;
+		counter = 0;
 	}
 
 	/**
@@ -73,7 +75,7 @@ public class Simulation implements Callable<Integer> {
 	 * @return number of iterations used until criterion is met
 	 */
 	private int startSimulation() {
-
+		
 		iteration = 0;
 		equilibriumReached = false;
 
@@ -142,7 +144,7 @@ public class Simulation implements Callable<Integer> {
 //					}
 //				}
 //			}
-			//System.out.println("total score = " + total_score);
+			System.out.println("total count = " + counter);
 			
 		} else {
 			// simulate iterations-steps
@@ -157,7 +159,7 @@ public class Simulation implements Callable<Integer> {
 	 * Simulates a single step.
 	 */
 	private void simulateStep() {
-
+		counter ++;
 		// calculate repulsive forces (from every vertex to every other)
 		for (Vertex v : graph.vertexSet()) {
 			// reset displacement vector for new calculation
