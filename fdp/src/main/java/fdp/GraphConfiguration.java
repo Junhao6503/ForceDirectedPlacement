@@ -26,8 +26,8 @@ public class GraphConfiguration {
 	private GraphGenerator<Vertex, Edge, ?> generator;
 	private Parameter param;
 	
-	public GraphConfiguration(GraphGenerator<Vertex, Edge, ?> generator, Parameter param) {
-		this.generator = generator;
+	public GraphConfiguration(Parameter param) {
+		//this.generator = generator;
 		this.setParameter(param);
 	}
 
@@ -36,8 +36,8 @@ public class GraphConfiguration {
 	 * @return
 	 * @throws FileNotFoundException 
 	 */
-	public Graph<Vertex, Edge> generateGraph() throws FileNotFoundException {
-		Graph<Vertex, Edge> graph = new SimpleGraph<>(new EdgeFactory());
+	public Graph<Vertex, Edge> generateGraph(String input_dir, String comm_dir, int start, int vertex_num, int dem) throws FileNotFoundException {
+		Graph<Vertex, Edge> graph = new SimpleGraph<Vertex, Edge>(new EdgeFactory());
 //		this.generator.generateGraph(graph, new VertexFactory(), null);
 //		Vertex v1 = new Vertex();
 //		Vertex v2  = new Vertex();
@@ -45,7 +45,7 @@ public class GraphConfiguration {
 //		graph.addVertex(v1);
 //		graph.addVertex(v2);
 //		graph.addEdge(v1, v2);
-		readFiletoGraph(graph);
+		readFiletoGraph(graph, input_dir, comm_dir, start,vertex_num, dem);
 		return graph;
 	}
 
@@ -57,25 +57,56 @@ public class GraphConfiguration {
 		this.param = param;
 	}
 	
-	private void readFiletoGraph(Graph<Vertex, Edge> graph) throws FileNotFoundException {
+	private void readFiletoGraph(Graph<Vertex, Edge> graph, String input_dir, String comm_dir, int start, int vertex_num, int dem) throws FileNotFoundException {
 		String line;
-		Set<String> set = new HashSet<>();
+		Set<String> set = new HashSet<String>();
 		ArrayList<Vertex> list = new ArrayList();
-		for(int i = 1; i <= 63; i ++) {
+		for(int i = 0; i < vertex_num+start; i ++) {
 			list.add(new Vertex());
 		}
-		for (int i = 0; i < 63; i ++) {
-			graph.addVertex(list.get(i));
-		}
-		File file = 
-			      new File("/Users/junhao/Downloads/SNAP/dolpins.txt"); 
-			    Scanner sc = new Scanner(file); 
+		File file = new File(comm_dir); 
+		Scanner sc = new Scanner(file); 
 			    while (sc.hasNextLine()) {
 			        line = sc.nextLine();
-			        String[] splited = line.split("\\t");
+			        String[] splited;
+			        if(dem == 0) {
+			        	splited = line.split("\\t");
+			        } else {
+			        	splited = line.split("\\s+");
+			        }
+			        int node = Integer.parseInt(splited[0]);
+			        int comm = Integer.parseInt(splited[1]);
+			        list.get(node).id = node;
+			        list.get(node).communities = comm;
+			        
+			        
+		} 
+		if(start == 1) {
+			for (int i = 1; i <= vertex_num; i ++) {
+				graph.addVertex(list.get(i));
+			}
+		} else {
+			for (int i = 0; i < vertex_num; i ++) {
+				graph.addVertex(list.get(i));
+			}
+		}
+		file = new File(input_dir); 
+		sc = new Scanner(file); 
+			    while (sc.hasNextLine()) {
+			        line = sc.nextLine();
+			        String[] splited;
+			        if(dem == 0) {
+			        	splited = line.split("\\t");
+			        } else {
+			        	splited = line.split("\\s+");
+			        }
 			        int source = Integer.parseInt(splited[0]);
 			        int dest = Integer.parseInt(splited[1]);
-			        graph.addEdge(list.get(source), list.get(dest));
+			        if(source != dest) {
+			        	graph.addEdge(list.get(source), list.get(dest));
+			        }
+			        list.get(source).neighbors.add(list.get(dest));
+			        list.get(dest).neighbors.add(list.get(source));
 			        
 			    } 
 	}

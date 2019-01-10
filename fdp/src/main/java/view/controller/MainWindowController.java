@@ -1,5 +1,6 @@
 package view.controller;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -214,7 +215,7 @@ public class MainWindowController {
 	}
 
 	@FXML
-	protected void simulateClicked(ActionEvent e) {
+	protected void simulateClicked(ActionEvent e) throws FileNotFoundException {
 		for (GraphConfiguration config : getGraphConfigurations()) {
 			Graph<Vertex, Edge> graph = config.generateGraph();
 			try {

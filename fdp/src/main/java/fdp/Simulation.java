@@ -61,8 +61,8 @@ public class Simulation implements Callable<Integer> {
 		this.delay = p.getFrameDelay();
 
 		// parse the force strings into Expressions that can be evaluated multiple times
-		attractiveForceExpr = Parser.parse(p.getAttractiveForce(), scope);
-		repulsiveForceExpr = Parser.parse(p.getRepulsiveForce(), scope);
+		//attractiveForceExpr = Parser.parse(p.getAttractiveForce(), scope);
+		//repulsiveForceExpr = Parser.parse(p.getRepulsiveForce(), scope);
 		total_score = 0;
 		total_length = 0;
 	}
@@ -91,29 +91,58 @@ public class Simulation implements Callable<Integer> {
 			while (!equilibriumReached && iteration < 1000) {
 				simulateStep();
 			}
-			int counter = 0;
-			for (Edge e : graph.edgeSet()) {
-				counter ++;
-				// normalized difference position vector of v and u
-				Vector2d deltaPos = new Vector2d();
-				deltaPos.sub(e.getV().getPos(), e.getU().getPos());
-				double length = deltaPos.length();
-				total_length += length;
-				
-			}
-			double ave = total_length / counter;
-			
-			for (Edge e : graph.edgeSet()) {
-
-				// normalized difference position vector of v and u
-				Vector2d deltaPos = new Vector2d();
-				deltaPos.sub(e.getV().getPos(), e.getU().getPos());
-				double length = deltaPos.length();
-				total_score += (length - ave) * (length - ave);
-				
-			}
-			System.out.println("AVE: "+ave);
-			System.out.println("Final Score: "+total_score);
+//			int counter = 0;
+//			for (Edge e : graph.edgeSet()) {
+//				counter ++;
+//				// normalized difference position vector of v and u
+//				Vector2d deltaPos = new Vector2d();
+//				deltaPos.sub(e.getV().getPos(), e.getU().getPos());
+//				double length = deltaPos.length();
+//				total_length += length;
+//				
+//			}
+//			double ave = total_length / counter;
+//			
+//			for (Edge e : graph.edgeSet()) {
+//
+//				// normalized difference position vector of v and u
+//				Vector2d deltaPos = new Vector2d();
+//				deltaPos.sub(e.getV().getPos(), e.getU().getPos());
+//				double length = deltaPos.length();
+//				total_score += (length - ave) * (length - ave);
+//				
+//			}
+//			System.out.println("AVE: "+ave);
+//			System.out.println("Final Score: "+total_score);
+//			double total_score = 0;
+//			for (Edge e : graph.edgeSet()) {
+//				// normalized difference position vector of v and u
+//				Vector2d deltaPos = new Vector2d();
+//				deltaPos.sub(e.getV().getPos(), e.getU().getPos());
+//				double length = deltaPos.length();
+//				
+//				
+//				if(e.edge_type ==0 ) {
+//					total_score += Math.abs(length - 100); 
+//				} else if(e.edge_type == 1) {
+//					total_score += Math.abs(length - 300); 
+//				}
+//				
+//			}
+//			
+//			for (Vertex v : graph.vertexSet()) {
+//				for (Vertex u : graph.vertexSet()) {
+//					if (!v.equals(u) && v.communities == u.communities && !v.neighbors.contains(u)) {
+//						// normalized difference position vector of v and u
+//						Vector2d deltaPos = new Vector2d();
+//						deltaPos.sub(v.getPos(), u.getPos());
+//						double length = deltaPos.length();
+//						total_score += Math.abs(length - 200); 
+//						
+//					}
+//				}
+//			}
+			//System.out.println("total score = " + total_score);
 			
 		} else {
 			// simulate iterations-steps
@@ -150,7 +179,13 @@ public class Simulation implements Callable<Integer> {
 
 		// calculate attractive forces (only between neighbors)
 		for (Edge e : graph.edgeSet()) {
-
+			Vertex src = e.getU();
+			Vertex dst = e.getV();
+			if(src.communities == dst.communities) {
+				e.edge_type = 0;
+			} else {
+				e.edge_type = 1;
+			}
 			// normalized difference position vector of v and u
 			Vector2d deltaPos = new Vector2d();
 			deltaPos.sub(e.getV().getPos(), e.getU().getPos());
@@ -213,9 +248,7 @@ public class Simulation implements Callable<Integer> {
 	 * @return amount of force
 	 */
 	private double forceAttractive(double d, double k) {
-		varD.setValue(d);
-		varK.setValue(k);
-		return attractiveForceExpr.evaluate();
+		return d * d / k;
 	}
 
 	/**
@@ -228,9 +261,7 @@ public class Simulation implements Callable<Integer> {
 	 * @return amount of force
 	 */
 	private double forceRepulsive(double d, double k) {
-		varD.setValue(d);
-		varK.setValue(k);
-		return repulsiveForceExpr.evaluate();
+		return k * k / d;
 	}
 
 	@Override
