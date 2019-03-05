@@ -14,6 +14,7 @@ public class Parameter {
 	private double criterionValue;
 	private double coolingRateValue;
 	private int frameDelayValue;
+	public String input_name;
 
 	public int getFrameWidth() {
 		return frameWidth;

@@ -66,33 +66,61 @@ public class App {
 		Scanner sc = new Scanner(System.in);
 		
 		
-		System.out.println("Enter the input file directory: ");
-		String input = sc.nextLine();
-		System.out.println("Enter the community file directory: ");
-		String comm = sc.nextLine();
-		System.out.println("Enter the start node(0 or 1): ");
-		int start = sc.nextInt();
-		System.out.println("Enter the number of nodes ");
-		int vertex_num = sc.nextInt();
-		System.out.println("Enter the delimiter (0 for tab, 1 for space):");
-		int dem = sc.nextInt();
+		
+		
+		System.out.println("Enter the input file: ");
+		String input;
+		String comm;
+		int start;
+		int vertex_num;
+		int dem;
+		switch (sc.nextLine()) {
+			case "kara":
+				input = "kara.txt";
+				comm = "communities_kara.txt";
+				start = 1;
+				vertex_num = 34;
+				dem = 0;
+				break;
+			case "dolphins":
+				input = "dolpins.txt";
+				comm = "communities_dolp.txt";
+				start = 0;
+				vertex_num = 62;
+				dem = 0;
+				break;
+			case "soc-tribes":
+				input = "soc-tribes.txt";
+				comm = "communities_tribe.txt";
+				start = 1;
+				vertex_num = 16;
+				dem = 1;
+				break;
+			default:
+				input = "kara.txt";
+				comm = "communities_kara.txt";
+				start = 1;
+				vertex_num = 34;
+				dem = 0;
+				break;
+		}
 		sc.close();
 		String input_dir = "/Users/junhao/Downloads/SNAP/" + input;
 		String comm_dir = "/Users/junhao/Downloads/SNAP/" + comm;
 		
 		p.setEquilibriumCriterion(true);
-		p.setCriterion(1000.0);
+		p.setCriterion(15.0);
 		p.setCoolingRate(0.01);
 		p.setFrameDelay(5);
 		p.setFrameWidth(800);
 		p.setFrameHeight(600);
-		
+		p.input_name = input;
 		GraphConfiguration config = new GraphConfiguration(p);
 		Graph<Vertex, Edge> graph = config.generateGraph(input_dir, comm_dir, start, vertex_num, dem);
 		
 		
 		
-		Future<?> f = Executors.newSingleThreadExecutor().submit(new Simulation(graph, config.getParameter()));
+		Future<?> f = Executors.newSingleThreadExecutor().submit(new Simulation(graph, config, p));
 		
 		futures.add(f);
 		
@@ -108,6 +136,7 @@ public class App {
 		PrintWriter printWriter = new PrintWriter(fileWriter);
 		PrintWriter printWriter_score = new PrintWriter(fileWriter_score);
 		
+		scoreGen scoregen = new scoreGen(graph,config.communitiesMap, p);
 		
 		for(Vertex v : graph.vertexSet()) {
 			//System.out.print("" + v.id + ": ");
@@ -124,7 +153,11 @@ public class App {
 		printWriter.close();
 		
 		double total_score = score(graph);
-		printWriter_score.printf("total score = " + total_score);
+		double node_spread = scoregen.nodeSpread();
+		double edge_length = scoregen.edgeLengthVariation();
+		printWriter_score.printf("total score = " + total_score + "\n");
+		printWriter_score.printf("node spread = " + node_spread + "\n");
+		printWriter_score.printf("edge_length = " + edge_length + "\n");
 		printWriter_score.close();
 		System.out.println("total score = " + total_score);
 	}

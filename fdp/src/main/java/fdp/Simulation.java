@@ -1,5 +1,9 @@
 package fdp;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.concurrent.Callable;
 
 import javax.vecmath.Vector2d;
@@ -43,7 +47,14 @@ public class Simulation implements Callable<Integer> {
 	private Expression attractiveForceExpr;
 	private Expression repulsiveForceExpr;
 
+	public ArrayList<Double> scoreList;
+	public ArrayList<Double> nodeSpreadList;
+	public ArrayList<Double> edgeLengthList;
 	private boolean equilibriumReached = false;
+	private GraphConfiguration config;
+	private Parameter p;
+	
+	private String input_name;
 
 	/**
 	 * Creates a new Simulation.
@@ -52,7 +63,7 @@ public class Simulation implements Callable<Integer> {
 	 * @param p
 	 * @throws ParseException
 	 */
-	public Simulation(Graph<Vertex, Edge> graph, Parameter p) throws ParseException {
+	public Simulation(Graph<Vertex, Edge> graph, GraphConfiguration config, Parameter p) throws ParseException {
 		this.graph = graph;
 		this.frameWidth = p.getFrameWidth();
 		this.frameHeight = p.getFrameHeight();
@@ -60,10 +71,15 @@ public class Simulation implements Callable<Integer> {
 		this.criterion = p.getCriterion();
 		this.coolingRate = p.getCoolingRate();
 		this.delay = p.getFrameDelay();
+		this.p = p;
+		this.config = config;
+		this.input_name = p.input_name;
 
 		// parse the force strings into Expressions that can be evaluated multiple times
 		//attractiveForceExpr = Parser.parse(p.getAttractiveForce(), scope);
 		//repulsiveForceExpr = Parser.parse(p.getRepulsiveForce(), scope);
+		nodeSpreadList = new ArrayList<Double>();
+		edgeLengthList = new ArrayList<Double>();
 		total_score = 0;
 		total_length = 0;
 		counter = 0;
@@ -73,12 +89,13 @@ public class Simulation implements Callable<Integer> {
 	 * Starts the simulation.
 	 * 
 	 * @return number of iterations used until criterion is met
+	 * @throws IOException 
 	 */
-	private int startSimulation() {
+	private int startSimulation() throws IOException {
 		
 		iteration = 0;
 		equilibriumReached = false;
-
+		scoreGen screogen = new scoreGen(this.graph, this.config.communitiesMap, this.p);
 		area = Math.min(frameWidth * frameWidth, frameHeight * frameHeight);
 		k = C * Math.sqrt(area / graph.vertexSet().size());
 		t = frameWidth / 10;
@@ -92,6 +109,11 @@ public class Simulation implements Callable<Integer> {
 			// simulate until mechanical equilibrium
 			while (!equilibriumReached && iteration < 1000) {
 				simulateStep();
+				if(counter % 100 == 0) {
+					//scoreList.add(score(graph));
+					nodeSpreadList.add(screogen.nodeSpread());
+					edgeLengthList.add(screogen.edgeLengthVariation());
+				}
 			}
 //			int counter = 0;
 //			for (Edge e : graph.edgeSet()) {
@@ -145,6 +167,29 @@ public class Simulation implements Callable<Integer> {
 //				}
 //			}
 			System.out.println("total count = " + counter);
+			//String conti_score_output = "/Users/junhao/Documents/new_sa/" + this.input_name + "_conti_score.txt";
+			String node_spread_output = "/Users/junhao/Documents/old_fdp_out/" + this.input_name + "_node_spread_score.txt";
+			String edge_length_output = "/Users/junhao/Documents/old_fdp_out/" + this.input_name + "_edge_length_score.txt";
+			//FileWriter fileWriter_cont = new FileWriter(conti_score_output);
+			FileWriter fileWriter_nodespread = new FileWriter(node_spread_output);
+			FileWriter fileWriter_edgelength = new FileWriter(edge_length_output);
+			//PrintWriter printWriter_cont = new PrintWriter(fileWriter_cont);
+			PrintWriter printWriter_nodespread = new PrintWriter(fileWriter_nodespread);
+			PrintWriter printWriter_length = new PrintWriter(fileWriter_edgelength);
+			
+
+			for(double i : nodeSpreadList) {
+				printWriter_nodespread.printf("" + i);
+				printWriter_nodespread.printf("\n");
+			}
+			for(double i : edgeLengthList) {
+				printWriter_length.printf("" + i);
+				printWriter_length.printf("\n");
+			}
+			//printWriter_cont.close();
+			//printWriter_glob.close();
+			printWriter_length.close();
+			printWriter_nodespread.close();
 			
 		} else {
 			// simulate iterations-steps
@@ -268,6 +313,7 @@ public class Simulation implements Callable<Integer> {
 
 	@Override
 	public Integer call() throws Exception {
+		System.out.println("MBL");
 		return startSimulation();
 	}
 }

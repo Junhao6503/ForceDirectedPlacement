@@ -12,6 +12,7 @@ import fdp.graph.VertexFactory;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
@@ -25,6 +26,7 @@ public class GraphConfiguration {
 
 	private GraphGenerator<Vertex, Edge, ?> generator;
 	private Parameter param;
+	public HashMap<Integer, HashSet<Vertex>> communitiesMap;
 	
 	public GraphConfiguration(Parameter param) {
 		//this.generator = generator;
@@ -38,6 +40,7 @@ public class GraphConfiguration {
 	 */
 	public Graph<Vertex, Edge> generateGraph(String input_dir, String comm_dir, int start, int vertex_num, int dem) throws FileNotFoundException {
 		Graph<Vertex, Edge> graph = new SimpleGraph<Vertex, Edge>(new EdgeFactory());
+		this.communitiesMap = new HashMap<Integer, HashSet<Vertex>>();
 //		this.generator.generateGraph(graph, new VertexFactory(), null);
 //		Vertex v1 = new Vertex();
 //		Vertex v2  = new Vertex();
@@ -78,6 +81,12 @@ public class GraphConfiguration {
 			        int comm = Integer.parseInt(splited[1]);
 			        list.get(node).id = node;
 			        list.get(node).communities = comm;
+			        if(!communitiesMap.containsKey(comm)){
+			        	communitiesMap.put(comm, new HashSet<Vertex>());
+			        	communitiesMap.get(comm).add(list.get(node));
+					} else {
+			        	communitiesMap.get(comm).add(list.get(node));
+					}
 			        
 			        
 		} 
